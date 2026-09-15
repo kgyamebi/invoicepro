@@ -447,7 +447,9 @@ function PdfDoc({ data }: { data: PdfDocument }) {
               <Text style={[layout.body, { marginTop: 8 }]}>{data.business.paymentInstructions}</Text>
             ) : null}
             {!data.paymentTerms && !payMethods.length && !data.business.paymentInstructions ? (
-              <Text style={layout.body}>Record payment with the seller. Online checkout is optional.</Text>
+              <Text style={layout.body}>
+                Pay the seller by cash, bank transfer, or mobile money. They will record the payment and issue a receipt.
+              </Text>
             ) : null}
           </View>
         ) : null}
