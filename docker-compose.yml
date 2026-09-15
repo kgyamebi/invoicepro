@@ -1,0 +1,50 @@
+services:
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: invoice
+      POSTGRES_PASSWORD: invoice
+      POSTGRES_DB: invoiceapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoice -d invoiceapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://invoice:invoice@database:5432/invoiceapp
+      REDIS_URL: redis://redis:6379
+      AUTH_SECRET: change-me-in-production
+      APP_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+
+  worker:
+    build: .
+    command: npm run worker
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://invoice:invoice@database:5432/invoiceapp
+      REDIS_URL: redis://redis:6379
+      AUTH_SECRET: change-me-in-production
+      APP_URL: http://localhost:3000
+
+volumes:
+  pgdata:
