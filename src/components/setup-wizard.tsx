@@ -26,9 +26,11 @@ export function SetupWizard({
   if (steps.every((step) => step.done)) {
     return (
       <Card className="border-success/30 bg-success-soft/40">
-        <p className="text-sm font-semibold text-success">You’re ready to collect</p>
+        <p className="text-sm font-semibold text-success">You’re ready to invoice</p>
         <p className="mt-1 text-sm text-muted">
-          First invoice paid. Use Reports for aging, and Security for two-factor authentication.
+          {paymentsHeld
+            ? "Share the invoice, then record cash, bank, or mobile money. A receipt is issued when it is paid in full."
+            : "First invoice paid. Use Reports for aging, and Security for two-factor authentication."}
         </p>
       </Card>
     );
@@ -36,7 +38,7 @@ export function SetupWizard({
   const completed = steps.filter((step) => step.done).length;
   const next = steps.find((step) => !step.done);
   const tips: Record<string, string> = {
-    "Add a customer": "A name and email is enough to send your first invoice.",
+    "Add a customer": "A name is enough. Email is optional if you share a link or WhatsApp.",
     "Add a product": "Save a service once — reuse it on every quote.",
     "Create a quotation": "Share a secure link. The customer can accept without an account.",
     "Create an invoice": "Convert an accepted quote or start from a blank invoice.",
@@ -49,7 +51,7 @@ export function SetupWizard({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-semibold">First-run setup</p>
-          <p className="mt-1 text-sm text-muted">Finish these steps to collect your first payment.</p>
+          <p className="mt-1 text-sm text-muted">Finish these steps to send your first invoice.</p>
         </div>
         <p className="text-xs font-medium text-muted">
           {completed}/{steps.length}

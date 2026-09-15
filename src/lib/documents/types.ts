@@ -1,3 +1,5 @@
+import { d } from "@/lib/money/decimal";
+
 export const DOCUMENT_TYPES = [
   "INVOICE",
   "QUOTATION",
@@ -11,6 +13,12 @@ export const DOCUMENT_TYPES = [
 ] as const;
 
 export type DocumentTypeKey = (typeof DOCUMENT_TYPES)[number];
+
+export function documentDashboardPath(type: string | undefined, id: string) {
+  if (type === "QUOTATION" || type === "ESTIMATE") return `/dashboard/quotations/${id}`;
+  if (type === "RECEIPT") return `/dashboard/receipts/${id}`;
+  return `/dashboard/invoices/${id}`;
+}
 
 export const DOCUMENT_STATUS = {
   QUOTATION: ["draft", "sent", "viewed", "accepted", "rejected", "expired"] as const,
@@ -46,7 +54,7 @@ export const TEMPLATES = [
   { key: "professional", name: "Professional" },
 ] as const;
 
-export function labelForDocumentType(type: DocumentTypeKey) {
+export function labelForDocumentType(type: string) {
   return type
     .toLowerCase()
     .split("_")
@@ -56,9 +64,9 @@ export function labelForDocumentType(type: DocumentTypeKey) {
 
 export function invoiceStatusFromBalance(balanceDue: string, grandTotal: string, current: string) {
   if (current === "cancelled") return "cancelled";
-  const balance = Number(balanceDue);
-  const total = Number(grandTotal);
-  if (total > 0 && balance <= 0) return "paid";
-  if (balance > 0 && balance < total) return "partially_paid";
+  const balance = d(balanceDue);
+  const total = d(grandTotal);
+  if (total.gt(0) && !balance.gt(0)) return "paid";
+  if (balance.gt(0) && balance.lt(total)) return "partially_paid";
   return current === "draft" ? "draft" : current;
 }

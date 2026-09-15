@@ -16,4 +16,12 @@ describe("payments held", () => {
     expect(pay).toContain("checkoutOff");
     expect(pay).toContain("How to pay");
   });
+
+  it("keeps the invoicing dashboard free of launch-ops banners", () => {
+    const layout = readFileSync("src/app/dashboard/layout.tsx", "utf8");
+    const settings = readFileSync("src/app/dashboard/settings/page.tsx", "utf8");
+    expect(layout).not.toContain("LaunchReadinessBanner");
+    expect(settings).not.toContain("email-health");
+    expect(settings).not.toContain("payment-ops");
+  });
 });
